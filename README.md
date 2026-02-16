@@ -14,6 +14,7 @@ An OpenClaw skill that enables your AI agent to:
 ## Features
 
 ✅ **Permanent inboxes** - Email addresses never expire  
+⚠️ **RECEIVE ONLY** - Currently receive-only (sending emails coming soon)  
 ✅ **Random or custom** - `9423924_bot@botemail.ai` or `mybot_bot@botemail.ai`  
 ✅ **JSON-first API** - Bot-friendly responses  
 ✅ **Free tier** - 1 address, 1000 requests/day  

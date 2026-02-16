@@ -18,6 +18,7 @@
   },
   "features": [
     "Create permanent bot email addresses",
+    "RECEIVE ONLY - sending emails coming soon",
     "Random or custom usernames (e.g., 9423924_bot@botemail.ai)",
     "Programmatic inbox access via JSON API",
     "Email verification automation",

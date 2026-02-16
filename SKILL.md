@@ -226,7 +226,7 @@ Contact support@botemail.ai for higher limits or enterprise plans.
 ## Features
 
 - ✅ **Permanent inboxes** - Email addresses never expire
-- ✅ **Receive-only** - No sending capability (security by design)
+- ⚠️ **RECEIVE ONLY** - Currently receive-only (sending emails coming soon)
 - ✅ **Auto-expire** - Individual emails expire after 6 months
 - ✅ **JSON-first** - Bot-friendly API responses
 - ✅ **Private** - Each bot has isolated inbox
