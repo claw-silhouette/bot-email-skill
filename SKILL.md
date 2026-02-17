@@ -1,23 +1,17 @@
 ---
 name: bot-email
-description: Professional email infrastructure for autonomous agents. Create and manage bot email accounts on BotEmail.ai for testing, automation, and email workflows. Supports proactive inbox monitoring via heartbeat — the agent checks the inbox automatically and acts on or escalates new emails. Free tier includes 1 address and 1000 requests/day.
+description: Create and manage bot email accounts on BotEmail.ai. Use for testing signup flows, receiving verification codes, automating email workflows, or monitoring incoming emails. Provides account creation, inbox checking, email retrieval, and deletion. Optionally set up periodic inbox notifications via heartbeat.
 ---
 
-# BotEmail.ai - Email for Bots
+# BotEmail.ai — Email for Bots
 
-Professional email infrastructure for autonomous agents. Create permanent bot email addresses and manage inboxes programmatically.
+Create permanent bot email addresses and manage inboxes programmatically via JSON API.
 
-## Setup — Proactive Inbox Monitoring
+## Setup
 
-When the user wants the agent to **monitor their BotEmail inbox automatically**, do the following:
+### 1. Create or retrieve an account
 
-### Step 1: Get credentials
-
-Ask the user for (or look up from TOOLS.md):
-- Their BotEmail address (e.g. `mybot_bot@botemail.ai`)
-- Their API key
-
-If they don't have an account yet, create one:
+If the user doesn't have an account yet, create one:
 
 ```
 POST https://api.botemail.ai/api/create-account
@@ -26,81 +20,46 @@ Content-Type: application/json
 {}
 ```
 
-### Step 2: Save credentials to TOOLS.md
-
-**Security note:** `TOOLS.md` is a local workspace file — it lives only on this machine, is never sent to any server, and should never be committed to a public repo. It is the standard OpenClaw location for local service credentials (equivalent to a `.env` file).
-
-Append to the workspace `TOOLS.md`:
-
-```markdown
-### BotEmail.ai
-- **Address:** `mybot_bot@botemail.ai`
-- **API Key:** `their-api-key`
-- **Inbox API:** `GET https://api.botemail.ai/api/emails/mybot_bot@botemail.ai`
-- **Auth:** `Authorization: Bearer their-api-key`
-- **Delete email:** `DELETE https://api.botemail.ai/api/emails/mybot_bot@botemail.ai/{emailId}`
-```
-
-### Step 3: Update HEARTBEAT.md
-
-**Ask the user first:** Before enabling monitoring, confirm: *"Should I check your inbox on every heartbeat and notify you of new emails? I can also act autonomously on safe requests (lookups, reminders) if you'd like — just say the word."* Only add monitoring if they confirm.
-
-Add (or replace) the email section in the workspace `HEARTBEAT.md`:
-
-```markdown
-## 📬 Email Inbox Check — mybot_bot@botemail.ai
-
-On every heartbeat, check the bot's inbox and notify the user of new emails.
-
-### Steps
-
-1. Fetch inbox:
-   ```
-   GET https://api.botemail.ai/api/emails/mybot_bot@botemail.ai
-   Authorization: Bearer their-api-key
-   ```
-
-2. Load seen email IDs from `memory/heartbeat-state.json` (key: `seenEmailIds`, default: `[]`)
-
-3. For each email NOT in `seenEmailIds`:
-   - Read subject + body
-   - **Always notify the user** with sender, subject, and a brief summary
-   - Only act autonomously (web search, reminders, lookups) if the user has explicitly enabled it
-   - **Never act autonomously** on: sending emails, deletions, public posts, or anything touching private data
-   - Add the email ID to `seenEmailIds` after processing
-
-4. Save updated `seenEmailIds` back to `memory/heartbeat-state.json`
-
-### Notification format
-> 📬 **New email** from [sender]
-> **Subject:** [subject]
-> [1-2 sentence summary]
-
-If inbox is empty or all emails already seen → HEARTBEAT_OK
-```
-
-### Step 4: Initialise state file
-
-Create `memory/heartbeat-state.json` if it doesn't exist:
+Returns:
 ```json
-{"seenEmailIds": [], "lastChecks": {}}
+{ "email": "9423924_bot@botemail.ai", "apiKey": "..." }
 ```
 
-### Done!
-Tell the user their inbox is now being monitored. They'll be notified on every heartbeat (~30 min) when new emails arrive.
+Custom username:
+```json
+{ "username": "mybot" }
+```
 
----
+Ask the user to save the returned email address and API key securely (e.g. password manager or `.env` file). Do not store them anywhere unless the user explicitly asks.
 
-## Manual Inbox Operations
-
-### Check Inbox
+### 2. Check inbox
 
 ```
 GET https://api.botemail.ai/api/emails/{email}
-Authorization: Bearer YOUR_API_KEY
+Authorization: Bearer {apiKey}
 ```
 
-Response:
+### 3. Optional: Inbox notifications via heartbeat
+
+If the user asks to be notified of new emails automatically, ask them to confirm they want this set up and which address to monitor. Then update `HEARTBEAT.md` to add a check that:
+
+1. Fetches the inbox using the user's credentials (ask them to provide the API key at setup time)
+2. Compares against seen IDs in `memory/heartbeat-state.json`
+3. **Notifies the user** of any new emails (sender, subject, preview) — does not take any action on their behalf
+4. Updates the seen ID list
+
+The agent only notifies — it does not act on email contents without a separate explicit user instruction.
+
+---
+
+## API Reference
+
+### GET /api/emails/{email}
+List all emails in inbox.
+
+**Headers:** `Authorization: Bearer {apiKey}`
+
+**Response:**
 ```json
 {
   "emails": [
@@ -109,57 +68,38 @@ Response:
       "from": "sender@example.com",
       "subject": "Hello",
       "timestamp": "2026-02-17T12:00:00Z",
-      "bodyText": "Hello from BotEmail!"
+      "bodyText": "Hello!"
     }
   ]
 }
 ```
 
-### Get Single Email
+### GET /api/emails/{email}/{id}
+Get a single email by ID.
 
-```
-GET https://api.botemail.ai/api/emails/{email}/{id}
-Authorization: Bearer YOUR_API_KEY
-```
+### DELETE /api/emails/{email}/{id}
+Delete a specific email.
 
-### Delete Email
-
-```
-DELETE https://api.botemail.ai/api/emails/{email}/{id}
-Authorization: Bearer YOUR_API_KEY
-```
-
-### Clear Inbox
-
-```
-DELETE https://api.botemail.ai/api/emails/{email}
-Authorization: Bearer YOUR_API_KEY
-```
+### DELETE /api/emails/{email}
+Clear entire inbox.
 
 ---
 
-## Quick Start (New Account)
+## Common Use Cases
 
-```bash
-curl -X POST https://api.botemail.ai/api/create-account \
-  -H "Content-Type: application/json" \
-  -d '{}'
-```
-
-Returns: `{ "email": "9423924_bot@botemail.ai", "apiKey": "..." }`
-
-Custom username:
-```bash
-curl -X POST https://api.botemail.ai/api/create-account \
-  -H "Content-Type: application/json" \
-  -d '{"username": "mybot"}'
-```
+- **Verification codes** — Create a bot address, trigger a signup flow, poll inbox for the code
+- **Notification monitoring** — Watch for specific emails from a service
+- **End-to-end testing** — Receive and verify automated emails in tests
+- **2FA codes** — Retrieve authentication codes automatically
 
 ---
 
-## Rate Limits
+## Notes
 
-- **Free Tier**: 1 bot address, 1000 requests/day
+- Emails stored for 6 months
+- Free tier: 1 address, 1,000 requests/day
+- All addresses end in `_bot@botemail.ai`
+- Receive only (sending not supported)
 
 ## Links
 
