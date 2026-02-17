@@ -26,7 +26,9 @@ Content-Type: application/json
 {}
 ```
 
-### Step 2: Save to TOOLS.md
+### Step 2: Save credentials to TOOLS.md
+
+**Security note:** `TOOLS.md` is a local workspace file — it lives only on this machine, is never sent to any server, and should never be committed to a public repo. It is the standard OpenClaw location for local service credentials (equivalent to a `.env` file).
 
 Append to the workspace `TOOLS.md`:
 
@@ -41,12 +43,14 @@ Append to the workspace `TOOLS.md`:
 
 ### Step 3: Update HEARTBEAT.md
 
+**Ask the user first:** Before enabling monitoring, confirm: *"Should I check your inbox on every heartbeat and notify you of new emails? I can also act autonomously on safe requests (lookups, reminders) if you'd like — just say the word."* Only add monitoring if they confirm.
+
 Add (or replace) the email section in the workspace `HEARTBEAT.md`:
 
 ```markdown
 ## 📬 Email Inbox Check — mybot_bot@botemail.ai
 
-On every heartbeat, check the bot's inbox for new emails and act proactively.
+On every heartbeat, check the bot's inbox and notify the user of new emails.
 
 ### Steps
 
@@ -55,33 +59,22 @@ On every heartbeat, check the bot's inbox for new emails and act proactively.
    GET https://api.botemail.ai/api/emails/mybot_bot@botemail.ai
    Authorization: Bearer their-api-key
    ```
-   Use `web_fetch` with the URL above.
 
 2. Load seen email IDs from `memory/heartbeat-state.json` (key: `seenEmailIds`, default: `[]`)
 
 3. For each email NOT in `seenEmailIds`:
    - Read subject + body
-   - **Decide autonomously** if the request is clear and safe (e.g. "search for X", "remind me of Y", "what's the weather") → do it and reply to the user with the result
-   - **Escalate to user** if ambiguous, sensitive, or needs approval → send a message saying who emailed and what they want
-   - Always add the email ID to `seenEmailIds` after processing
+   - **Always notify the user** with sender, subject, and a brief summary
+   - Only act autonomously (web search, reminders, lookups) if the user has explicitly enabled it
+   - **Never act autonomously** on: sending emails, deletions, public posts, or anything touching private data
+   - Add the email ID to `seenEmailIds` after processing
 
 4. Save updated `seenEmailIds` back to `memory/heartbeat-state.json`
-
-### What counts as "act autonomously"
-- Informational lookups (web search, weather, definitions)
-- Setting reminders (use cron tool)
-- Summarising content from a URL
-- Answering factual questions
-
-### What to escalate
-- Requests to send emails, post publicly, or delete things
-- Anything requiring judgment about the user's private data
-- Requests you're not confident about
 
 ### Notification format
 > 📬 **New email** from [sender]
 > **Subject:** [subject]
-> [1-2 sentence summary or result if you acted on it]
+> [1-2 sentence summary]
 
 If inbox is empty or all emails already seen → HEARTBEAT_OK
 ```
@@ -94,7 +87,7 @@ Create `memory/heartbeat-state.json` if it doesn't exist:
 ```
 
 ### Done!
-Tell the user their inbox is now being monitored. Every heartbeat (~30 min), new emails will be processed automatically.
+Tell the user their inbox is now being monitored. They'll be notified on every heartbeat (~30 min) when new emails arrive.
 
 ---
 
