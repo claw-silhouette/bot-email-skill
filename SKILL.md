@@ -1,6 +1,6 @@
 ---
 name: bot-email
-description: Get a free bot email address instantly — no signup or setup needed. Just say "get me a bot email" and the agent creates your address in seconds. Supports inbox monitoring, attachment downloads, and heartbeat auto-notifications.
+description: Get a free bot email address instantly — no steps other than installing needed. Just say "get me a bot email" and the agent creates your address in seconds. Supports inbox monitoring, attachment downloads, and heartbeat auto-notifications.
 ---
 
 # BotEmail.ai — Email for Bots
