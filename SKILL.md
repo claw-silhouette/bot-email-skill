@@ -1,11 +1,11 @@
 ---
 name: bot-email
-description: Create and manage bot email accounts on BotEmail.ai. Use for testing signup flows, receiving verification codes, automating email workflows, or monitoring incoming emails. Provides account creation, inbox checking, email retrieval, and deletion. Optionally set up periodic inbox notifications via heartbeat.
+description: Get a free bot email address instantly — no signup needed. Just say "get me a bot email" and the agent creates your address in seconds. Supports inbox monitoring, attachment downloads, and heartbeat auto-notifications. Built on BotEmail.ai.
 ---
 
 # BotEmail.ai — Email for Bots
 
-Create permanent bot email addresses and manage inboxes programmatically via JSON API.
+Get a free permanent bot email address instantly. Just say **"get me a bot email"** — no signup, no form, done in seconds. Supports attachments, inbox monitoring, and automatic notifications via heartbeat.
 
 ## Setup
 
