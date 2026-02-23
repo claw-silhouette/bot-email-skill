@@ -1,0 +1,11 @@
+{
+  "version": "1.0.1",
+  "organization": "DEVGM Studios",
+  "date": "February 2026",
+  "abstract": "Create and manage free bot email inboxes via BotEmail.ai API. Supports inbox creation, email reading, verification code extraction, and deletion. Designed for agent automation workflows requiring email addresses without human intervention.",
+  "references": [
+    "https://botemail.ai",
+    "https://api.botemail.ai",
+    "https://openclaw.ai"
+  ]
+}
